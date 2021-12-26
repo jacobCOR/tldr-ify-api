@@ -3,16 +3,8 @@ services:
   web:
     build: .
     ports:
-      - "5002:5000"
+      - "5002:8080"
     volumes:
       - .:/code
-    depends_on:
-      - mongodb
     environment:
-      - MONGODB_CONNSTRING=mongodb://root:example@mongodb
-      - ENVIRONMENT=development
-  mongodb:
-    image: mongo:5.0
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=example
+      - ENVIRONMENT=production

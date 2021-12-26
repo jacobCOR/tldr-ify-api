@@ -18,3 +18,4 @@ class TestingConfig(BaseConfig):
 
 class ProductionConfig(BaseConfig):
     MONGO_URI = "production_mongo_uri"
+    FLASK_ENV = "production"

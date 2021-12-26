@@ -45,8 +45,7 @@ class ModelCaller:
             for i, data in enumerate(text_input):
                 input_ids, _ = data
 
-                output = self.model.generate(input_ids,
-                                             t)
+                output = self.model.generate(input_ids)
 
                 for original, summary in zip(input_ids, output):
                     results = (self.tokenizer.decode(original, skip_special_tokens=True),
