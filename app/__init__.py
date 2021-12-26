@@ -29,6 +29,7 @@ def create_app(model, config_filename=None):
 def create_secrets():
     print("creating secrets")
     yaml_api_key = {'api_key': ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(48))}
+    print(yaml_api_key)
     with open('secrets.yml', 'w') as outfile:
         yaml.dump(yaml_api_key, outfile, default_style=False)
 
