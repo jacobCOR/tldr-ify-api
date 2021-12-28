@@ -8,13 +8,15 @@ from flask_restful import Api
 
 from .api.routes import api, Tldr
 from .model.model_fetch import ModelCaller
+from flask import current_app
 
 
-def create_app(model, config_filename=None):
+def create_app(model, logger, config_filename=None):
     app = Flask(__name__)
     app = secure_app(app)
     flask_api = Api(api)
     app.config['MODEL'] = model
+    app.config['LOGGER'] = logger
 
     if config_filename:
         app.config.from_object(config_filename)
@@ -27,9 +29,9 @@ def create_app(model, config_filename=None):
 
 
 def create_secrets():
-    print("creating secrets")
+    current_app.config['LOGGER'].info("Generating Secrets.yml")
     yaml_api_key = {'api_key': ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(48))}
-    print(yaml_api_key)
+    current_app.config['LOGGER'].info(yaml_api_key)
     with open('secrets.yml', 'w') as outfile:
         yaml.dump(yaml_api_key, outfile, default_style=False)
 
@@ -39,7 +41,7 @@ def load_secrets():
         try:
             return yaml.safe_load(infile)
         except yaml.YAMLError as exception:
-            print(exception)
+            current_app.config['LOGGER'].error(exception)
 
 
 def secure_app(app):

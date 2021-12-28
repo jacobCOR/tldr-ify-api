@@ -1,4 +1,4 @@
-from flask import Blueprint, request, Response
+from flask import Blueprint, request, Response, abort
 from flask_restful import Resource
 from flask import current_app as app
 
@@ -16,16 +16,22 @@ def verify_json(json_data):
         return True
 
 
+def is_valid_json(json_data):
+    if not json_data:
+        abort(Response("No JSON in request",
+                       status=400))
+    valid_json = verify_json(json_data['text'])
+    if not valid_json:
+        abort(Response("Invalid JSON format",
+                       status=400))
+
+
 class Tldr(Resource):
     @staticmethod
     @require_key
     def get():
         json_data = request.get_json()
-        valid_json = verify_json(json_data['text'])
-        if not json_data or not valid_json:
-            return Response("Invalid JSON format",
-                            status=400)
-
+        is_valid_json(json_data)
         original, summary = app.config['MODEL'].model_call(json_data['text'])
         return {'text': original,
                 'summary': summary}

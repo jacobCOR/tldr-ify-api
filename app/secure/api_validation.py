@@ -19,6 +19,6 @@ def require_key(f):
         if match_api_keys(request.args.get('key')):
             return f(*args, **kwargs)
         else:
-            print("Unauthorized address trying to use API: " + request.remote_addr)
+            app.config['LOGGER'].warning("Unauthorized access trying to use API: " + request.remote_addr)
             abort(401)
     return wrapper

@@ -7,9 +7,9 @@ class ModelCaller:
     model = None
     tokenizer = None
 
-    def __init__(self):
+    def __init__(self, logger):
+        self.logger = logger
         self.__init_model()
-        print("initialized models")
 
     def model_call(self, text):
         # call ml model with text.
@@ -25,6 +25,7 @@ class ModelCaller:
         self.model.load_state_dict(torch.load("./app/model/obj/model_full_bart_epoch_3.pt",
                                               map_location=torch.device(device)), strict=False)
         self.model.to(device)
+        self.logger.debug("Initialized Models")
 
     def __tokenize_input(self, text):
 
