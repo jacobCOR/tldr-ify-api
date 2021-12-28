@@ -8,6 +8,7 @@ class BaseConfig(object):
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = False
+    ENV = "development"
     MONGO_URI = os.getenv("MONGODB_CONNSTRING")
 
 

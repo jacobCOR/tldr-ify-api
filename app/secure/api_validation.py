@@ -4,6 +4,8 @@ from flask import current_app as app
 
 
 def match_api_keys(key):
+    if app.config['ENV'] == 'development':
+        return True
     if key is None:
         return False
     api_key = app.config['secrets']

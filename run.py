@@ -20,7 +20,6 @@ logger = init_logging()
 model = ModelCaller(logger)
 
 env = os.getenv("ENVIRONMENT")
-env = "production"
 if env == "development":
     app = create_app(model, logger, config_filename=config.DevelopmentConfig)
 elif env == "production":
@@ -34,4 +33,4 @@ if __name__ == "__main__":
 
         serve(app, host='0.0.0.0', port=8080)
     else:
-        app.run()
+        app.run(debug=True)
