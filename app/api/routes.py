@@ -29,7 +29,7 @@ def is_valid_json(json_data):
 class Tldr(Resource):
     @staticmethod
     @require_key
-    def get():
+    def post():
         json_data = request.get_json()
         is_valid_json(json_data)
         original, summary = app.config['MODEL'].model_call(json_data['text'])
