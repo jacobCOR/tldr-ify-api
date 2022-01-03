@@ -46,7 +46,12 @@ class ModelCaller:
             for i, data in enumerate(text_input):
                 input_ids, _ = data
 
-                output = self.model.generate(input_ids)
+                output = self.model.generate(input_ids,
+                                             num_beams=4,
+                                             no_repeat_ngram_size=2,
+                                             min_length=30,
+                                             max_length=100,
+                                             early_stopping=True)
 
                 for original, summary in zip(input_ids, output):
                     results = (self.tokenizer.decode(original, skip_special_tokens=True),
