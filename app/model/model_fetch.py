@@ -14,7 +14,7 @@ class ModelCaller:
     def model_call(self, text):
         # call ml model with text.
         dataloader = self.__tokenize_input(text)
-        original, summary = self.__generate_summary(dataloader)
+        original, summary = self.__generate_summary(dataloader, len(text))
         return original, summary
 
     def __init_model(self, device='cpu'):
@@ -40,18 +40,22 @@ class ModelCaller:
         train_dataloader = torch.utils.data.DataLoader(dataset, batch_size=1)
         return train_dataloader
 
-    def __generate_summary(self, text_input):
+    def __generate_summary(self, text_input, n):
         with torch.no_grad():
             results = {}  # compile list of outputs
             for i, data in enumerate(text_input):
                 input_ids, _ = data
-
-                output = self.model.generate(input_ids,
-                                             num_beams=4,
-                                             no_repeat_ngram_size=2,
-                                             min_length=30,
-                                             max_length=100,
-                                             early_stopping=True)
+                if n <= 45:
+                    output = self.model.generate(input_ids,
+                                                 num_beams=4,
+                                                 max_length=n)
+                else:
+                    output = self.model.generate(input_ids,
+                                                 num_beams=4,
+                                                 no_repeat_ngram_size=2,
+                                                 min_length=30,
+                                                 max_length=100,
+                                                 early_stopping=True)
 
                 for original, summary in zip(input_ids, output):
                     results = (self.tokenizer.decode(original, skip_special_tokens=True),
