@@ -7,15 +7,14 @@ class ModelCaller:
     model = None
     tokenizer = None
 
-    def __init__(self, logger):
-        self.logger = logger
+    def __init__(self):
         self.__init_model()
 
     def model_call(self, text):
         # call ml model with text.
         dataloader = self.__tokenize_input(text)
-        original, summary = self.__generate_summary(dataloader)
-        return original, summary
+        _, summary = self.__generate_summary(dataloader, len(text))
+        return summary
 
     def __init_model(self, device='cpu'):
         self.model = BartForConditionalGeneration.from_pretrained('facebook/bart-base').to(
@@ -25,7 +24,6 @@ class ModelCaller:
         self.model.load_state_dict(torch.load("./app/model/obj/model_full_bart_epoch_3.pt",
                                               map_location=torch.device(device)), strict=False)
         self.model.to(device)
-        self.logger.debug("Initialized Models")
 
     def __tokenize_input(self, text):
 
@@ -40,18 +38,22 @@ class ModelCaller:
         train_dataloader = torch.utils.data.DataLoader(dataset, batch_size=1)
         return train_dataloader
 
-    def __generate_summary(self, text_input):
+    def __generate_summary(self, text_input, n):
         with torch.no_grad():
             results = {}  # compile list of outputs
             for i, data in enumerate(text_input):
                 input_ids, _ = data
-
-                output = self.model.generate(input_ids,
-                                             num_beams=4,
-                                             no_repeat_ngram_size=2,
-                                             min_length=30,
-                                             max_length=100,
-                                             early_stopping=True)
+                if n <= 45:
+                    output = self.model.generate(input_ids,
+                                                 num_beams=4,
+                                                 max_length=n)
+                else:
+                    output = self.model.generate(input_ids,
+                                                 num_beams=4,
+                                                 no_repeat_ngram_size=2,
+                                                 min_length=30,
+                                                 max_length=100,
+                                                 early_stopping=True)
 
                 for original, summary in zip(input_ids, output):
                     results = (self.tokenizer.decode(original, skip_special_tokens=True),

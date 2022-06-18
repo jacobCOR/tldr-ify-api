@@ -1,6 +1,6 @@
 version: '3.9'
 services:
-  web:
+  app:
     build: .
     ports:
       - "8888:8080"
@@ -8,3 +8,14 @@ services:
       - .:/code
     environment:
       - ENVIRONMENT=production
+  mongo_db_container:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - "27017:27017"
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"

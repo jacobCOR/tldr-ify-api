@@ -10,6 +10,6 @@ handlers:
     formatter: simple
     stream: ext://sys.stdout
 
-root:
+app:
   level: DEBUG
   handlers: [console]
