@@ -1,22 +1,21 @@
 import secrets
 import string
-import yaml
 from os.path import exists
 
+import yaml
 from flask import Flask
+from flask import current_app
 from flask_restful import Api
 
-from .api.routes import api, Tldr
-from .model.model_fetch import ModelCaller
-from flask import current_app
+from app.api.routes import Tldr, api
+from app.data.data_adapter import DataAdapter
 
 
-def create_app(model, logger, config_filename=None):
+def create_app(config_filename=None):
     app = Flask(__name__)
     app = secure_app(app)
     flask_api = Api(api)
-    app.config['MODEL'] = model
-    app.config['LOGGER'] = logger
+    app.config['DATA'] = DataAdapter()
 
     if config_filename:
         app.config.from_object(config_filename)
@@ -24,6 +23,13 @@ def create_app(model, logger, config_filename=None):
     with app.app_context():
         flask_api.add_resource(Tldr, '/v1/tldrify')
         app.register_blueprint(api, url_prefix="/app")
+
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+        return response
 
     return app
 

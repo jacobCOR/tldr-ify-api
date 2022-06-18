@@ -4,8 +4,10 @@ import os
 import yaml
 
 import config
-from app import create_app
-from app.model.model_fetch import ModelCaller
+from app.celery.celery_utils import init_celery
+from app.celery import celery
+
+from app.main import create_app
 
 
 def init_logging():
@@ -16,30 +18,19 @@ def init_logging():
     return logging.getLogger()
 
 
-logger = init_logging()
-model = ModelCaller(logger)
-
-env = os.getenv("ENVIRONMENT")
-if env == "development":
-    app = create_app(model, logger, config_filename=config.DevelopmentConfig)
-elif env == "production":
-    app = create_app(model, logger, config_filename=config.ProductionConfig)
-else:
-    app = create_app(model, logger)
-
-
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
-    return response
-
-
 if __name__ == "__main__":
+    env = os.getenv("ENVIRONMENT")
+    if env == "development":
+        app = create_app(config_filename=config.DevelopmentConfig)
+    elif env == "production":
+        app = create_app(config_filename=config.ProductionConfig)
+    else:
+        app = create_app()
+
+    init_celery(celery, app)
+
     if env == "production":
         from waitress import serve
-
         serve(app, host='0.0.0.0', port=8080)
     else:
         app.run(debug=True)

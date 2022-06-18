@@ -7,15 +7,14 @@ class ModelCaller:
     model = None
     tokenizer = None
 
-    def __init__(self, logger):
-        self.logger = logger
+    def __init__(self):
         self.__init_model()
 
     def model_call(self, text):
         # call ml model with text.
         dataloader = self.__tokenize_input(text)
-        original, summary = self.__generate_summary(dataloader, len(text))
-        return original, summary
+        _, summary = self.__generate_summary(dataloader, len(text))
+        return summary
 
     def __init_model(self, device='cpu'):
         self.model = BartForConditionalGeneration.from_pretrained('facebook/bart-base').to(
@@ -25,7 +24,6 @@ class ModelCaller:
         self.model.load_state_dict(torch.load("./app/model/obj/model_full_bart_epoch_3.pt",
                                               map_location=torch.device(device)), strict=False)
         self.model.to(device)
-        self.logger.debug("Initialized Models")
 
     def __tokenize_input(self, text):
 
