@@ -17,7 +17,6 @@ class DataAdapter:
         summary = self.redis_adapter.get_data(text_to_summarize)
         if not summary:
             summary = self.mongo_adapter.get_data(text_to_summarize)
-            self.__populate_redis(text_to_summarize, summary)
         if not summary:
             summary = self.model_caller.model_call(text_to_summarize)
             self.__populate_redis(text_to_summarize, summary)
